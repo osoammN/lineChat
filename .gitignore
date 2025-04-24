@@ -1,0 +1,15 @@
+# Node.js dependencies
+node_modules/
+
+# Environment secrets
+.env
+
+# Excel log file (optional: ignore if you don’t want to track messages.xlsx)
+messages.xlsx
+
+# OS-specific junk files
+.DS_Store
+Thumbs.db
+
+# VS Code settings (optional)
+.vscode/
