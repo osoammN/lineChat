@@ -17,18 +17,22 @@ app.post('/webhook', line.middleware(config), (req, res) => {
       const userId = event.source.userId;
       let message = event.message.text; // ✅ Change to `let` instead of `const`
       const parts = message.split(","); // ✅ Correct spelling: split (not spilt)
-      const question = parts[0]?.trim();
-      const answer = parts[1]?.trim();
-      const author = parts[2]?.trim();
-
-      // ✅ Save to Google Sheet
-      await logToGoogleSheet(question, answer, author);
+      const func = parts[0]?.trim();
+      const question = parts[1]?.trim();
+      const answer = parts[2]?.trim();
+      const author = parts[3]?.trim();
+      if (func =="S" | "เก็บข้อมูล"){
+        await logToGoogleSheet(question, answer, author);
+      }
+      
+      
+      
 
       // ✅ Reply to user
-      await client.replyMessage(event.replyToken, {
-        type: 'text',
-        text: `📩 Received: "${message}"`,
-      });
+    //   await client.replyMessage(event.replyToken, {
+    //     type: 'text',
+    //     text: `📩 Received: "${message}"`,
+    //   });
     }
   }))
   .then(() => res.status(200).end())
