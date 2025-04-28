@@ -1,9 +1,7 @@
-require('dotenv').config(); // 👈 this loads .env values into process.env
+require('dotenv').config();
 const express = require('express');
 const line = require('@line/bot-sdk');
-const XLSX = require('xlsx');
-const fs = require('fs');
-const path = require('path');
+const logToGoogleSheet = require('./googleSheet');
 
 const config = {
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
@@ -13,54 +11,34 @@ const config = {
 const client = new line.Client(config);
 const app = express();
 
-// Save message to Excel file
-function saveToExcel(userId, message) {
-  const filePath = path.join(__dirname, 'messages.xlsx');
-  let workbook;
-  let worksheet;
-  let data = [];
-
-  // Load existing file or create new one
-  if (fs.existsSync(filePath)) {
-    workbook = XLSX.readFile(filePath);
-    worksheet = workbook.Sheets['Sheet1'];
-    data = XLSX.utils.sheet_to_json(worksheet);
-  } else {
-    workbook = XLSX.utils.book_new();
-  }
-
-  // Add new entry
-  data.push({
-    Timestamp: new Date().toISOString(),
-    UserID: userId,
-    Message: message,
-  });
-
-  // Convert back to sheet and write
-  const newSheet = XLSX.utils.json_to_sheet(data);
-  XLSX.utils.book_append_sheet(workbook, newSheet, 'Sheet1');
-  XLSX.writeFile(workbook, filePath);
-}
-
 app.post('/webhook', line.middleware(config), (req, res) => {
-  Promise
-    .all(req.body.events.map(async (event) => {
-      if (event.type === 'message' && event.message.type === 'text') {
-        const userId = event.source.userId;
-        const message = event.message.text;
+  Promise.all(req.body.events.map(async (event) => {
+    if (event.type === 'message' && event.message.type === 'text') {
+      const userId = event.source.userId;
+      let message = event.message.text; // ✅ Change to `let` instead of `const`
+      const parts = message.split(","); // ✅ Correct spelling: split (not spilt)
+      const question = parts[0]?.trim();
+      const answer = parts[1]?.trim();
+      const author = parts[2]?.trim();
 
-        saveToExcel(userId, message); // 🟢 Save to Excel
+      // ✅ Save to Google Sheet
+      await logToGoogleSheet(question, answer, author);
 
-        await client.replyMessage(event.replyToken, {
-          type: 'text',
-          text: `Received: "${message}"`,
-        });
-      }
-    }))
-    .then(() => res.status(200).end());
+      // ✅ Reply to user
+      await client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: `📩 Received: "${message}"`,
+      });
+    }
+  }))
+  .then(() => res.status(200).end())
+  .catch(err => {
+    console.error("Webhook error:", err);
+    res.status(500).end();
+  });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+  console.log(`🚀 Server is running on port ${PORT}`);
 });
