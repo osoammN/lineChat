@@ -21,7 +21,7 @@ app.post('/webhook', line.middleware(config), (req, res) => {
       const question = parts[1]?.trim();
       const answer = parts[2]?.trim();
       const author = parts[3]?.trim();
-     if (func =="S" | "เก็บข้อมูล"){
+     if (func =="S" || "เก็บข้อมูล"){
         await logToGoogleSheet(question, answer, author);
         await client.replyMessage(event.replyToken, {
         type: 'text',
