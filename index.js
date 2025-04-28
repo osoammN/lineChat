@@ -20,9 +20,11 @@ app.post('/webhook', line.middleware(config), (req, res) => {
       const func = parts[0]?.trim();
       const question = parts[1]?.trim();
       const answer = parts[2]?.trim();
-      const author = parts[3]?.trim();
-      if (func =="Save"){
-        await logToGoogleSheet(question, answer, author);
+      const type = parts[3]?.trim();
+      const author = parts[4]?.trim();
+      if (func === "Save"){
+      const type = parts[3]?.trim();
+        await logToGoogleSheet(question, answer,type, author);
         await client.replyMessage(event.replyToken, {
         type: 'text',
         text: `📩 Received: "${message}"`,
