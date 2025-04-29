@@ -22,7 +22,7 @@ app.post('/webhook', line.middleware(config), (req, res) => {
       const answer = parts[2]?.trim();
       const type = parts[3]?.trim();
       const author = parts[4]?.trim();
-      if (func === "s" || func === "S") {
+      if ((func === "s" || func === "S") && parts.length === 5) {
         const type = parts[3]?.trim();
         await logToGoogleSheet(question, answer, type, author);
         await client.replyMessage(event.replyToken, {
