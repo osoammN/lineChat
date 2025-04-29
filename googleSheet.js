@@ -8,7 +8,7 @@ const creds = {
   private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/gm, '\n'),
 };
 
-async function logToGoogleSheet(question, answer, author) {
+async function logToGoogleSheet(question, answer,type, author) {
   const doc = new GoogleSpreadsheet(SHEET_ID);
 
   await doc.useServiceAccountAuth(creds);
