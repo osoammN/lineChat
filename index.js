@@ -22,7 +22,7 @@ app.post('/webhook', line.middleware(config), (req, res) => {
       const answer = parts[2]?.trim();
       const type = parts[3]?.trim();
       const author = parts[4]?.trim();
-      if (func === "Save"){
+      if (func === "s" || "S"){
       const type = parts[3]?.trim();
         await logToGoogleSheet(question, answer,type, author);
         await client.replyMessage(event.replyToken, {
@@ -30,15 +30,6 @@ app.post('/webhook', line.middleware(config), (req, res) => {
         text: `📩 Received: "${message}"`,
       });
     }
-      
-      
-      
-
-      // ✅ Reply to user
-    //   await client.replyMessage(event.replyToken, {
-    //     type: 'text',
-    //     text: `📩 Received: "${message}"`,
-    //   });
     }
   }))
   .then(() => res.status(200).end())
