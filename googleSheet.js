@@ -19,6 +19,7 @@ async function logToGoogleSheet(question, answer, author) {
     Timestamp: new Date().toISOString(),
     Question: question,
     Answer: answer,
+    Type: type,
     Author: author,
   });
 }
